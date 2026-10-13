@@ -1,3 +1,4 @@
+// MCP v3 - free-to-play version
 import React, { useState, useEffect } from 'react';
 import { Modal, View, Text, Image, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { C, Btn, notify } from './ui';
@@ -165,7 +166,7 @@ export default function MovieScreen({ visible, movie, entry, tiers, count, initi
           ) : mine ? (
             <Btn title="Edit my entry" color="#2a2a2a" onPress={() => onJoin(movie, mine)} />
           ) : (
-            <Btn title="Join free with Ad  ▶" color="#f4f4f4" onPress={() => onJoin(movie, null)} style={{ borderRadius: 24, paddingVertical: 14 }} />
+            <Btn title="Join free with Ad  ▶" color={C.red} onPress={() => onJoin(movie, null)} style={{ borderRadius: 24, paddingVertical: 14 }} />
           )}
         </View>
       </View>

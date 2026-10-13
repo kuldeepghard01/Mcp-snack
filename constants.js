@@ -1,3 +1,4 @@
+// MCP v3 - free-to-play version
 // ---------- MCP Fantasy: settings ----------
 export const SUPABASE_URL = "https://zlgwkwdpwswdnuuetzhe.supabase.co";
 export const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpsZ3drd2Rwd3N3ZG51dWV0emhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc5MTI2NjIsImV4cCI6MjEwMzQ4ODY2Mn0.cOtOhQUvBiW4PwqthRCP3Q_5pZUTq1mUEakWZWVWIMM";
@@ -5,9 +6,15 @@ export const TMDB_KEY = "15d2ea6d0dc1d476efbca3eba219bbf0";
 
 export const APP_VERSION = "3.0.0";
 
-// AdMob ad unit IDs. Empty = Google test ads (safe for testing).
-// Put your real AdMob IDs here before launch.
-export const ADMOB = { rewarded: "", banner: "" };
+// AdMob settings.
+// testMode = true shows Google TEST ads (safe). Keep it true while testing, because
+// clicking or over-viewing your own real ads can get your AdMob account banned.
+// Set testMode to false only in the final release build.
+export const ADMOB = {
+  testMode: true,
+  rewarded: "ca-app-pub-3558136570580125/4253439264",
+  banner: "",
+};
 
 export const CATEGORIES = ["Bollywood", "Hollywood", "Tollywood", "Other"];
 export const DEFAULT_QUESTIONS = ["Hero death", "Heroine death", "Love story", "Action", "Love story + Action"];
@@ -70,8 +77,8 @@ export const TERMS = [
   { h: "2. Eligibility", t: "You must be at least 18 years old. You are responsible for making sure that joining prediction games with prizes is allowed where you live. If it is not allowed, please do not use the app." },
   { h: "3. How to play", t: "Open a movie, enter your Day 1 collection prediction and answer the movie questions. You join by watching a short ad. You can change your prediction until entries close. Entries close at 12:00 AM (India time) on the movie release date. One entry per movie per user." },
   { h: "4. Scoring and winners", t: "Collection score: up to 100 points, based on how close your prediction is to the official Day 1 collection. Movie score: 10 points for each movie question you answer correctly. Your total score decides your rank. If scores are equal, the better collection score wins, then the earlier entry. The official collection and answers are set by the MCP team using public sources. Our decision is final." },
-  { h: "5. Coins", t: "Winners receive coins by rank: Rank 1 gets 25,000, ranks 2 to 10 get 10,000 each, ranks 11 to 100 get 6,500 each, ranks 101 to 1,000 get 2,000 each and ranks 1,001 to 50,000 get 1,000 each. You can also earn coins by watching ads in the Coins tab, up to the daily limit. Coins have no cash value. They cannot be bought, sold, transferred or exchanged for money." },
-  { h: "6. Rewards", t: "You can use coins to request movie tickets from the Coins tab. Rewards depend on availability and are fulfilled manually by the MCP team. We may ask for extra details, refuse suspicious requests or change the reward list and coin prices at any time. If a request is refused, your coins are returned." },
+  { h: "5. Coins", t: "Winners receive coins by rank: Rank 1 gets 25,000, ranks 2 to 10 get 10,000 each, ranks 11 to 100 get 6,500 each, ranks 101 to 1,000 get 2,000 each and ranks 1,001 to 50,000 get 1,000 each. New users get welcome coins (the amount may change). You can also earn coins by watching ads in the Coins tab, up to the daily limit. Coins expire if they are not used within the expiry period shown in the Coins tab (90 days by default). Coins have no cash value. They cannot be bought, sold, transferred or exchanged for money." },
+  { h: "6. Rewards", t: "You can use coins to request movie tickets from the Coins tab. Rewards depend on availability and are fulfilled manually by the MCP team. To request a reward, your account must meet the age and activity rules shown in the Coins tab, and monthly limits apply. We may ask for extra details, refuse suspicious requests or change the reward list, rules and coin prices at any time. If a request is refused, your coins are returned." },
   { h: "7. Fair play", t: "One person, one account. Using multiple accounts, bots, scripts, or exploiting bugs is not allowed and may lead to account removal and loss of coins." },
   { h: "8. Ads and partners", t: "The app shows ads and sponsored content from Google AdMob and partner brands. Ads may use your device advertising ID as allowed by your consent choices and local law. Sponsored links open third-party sites that we do not control." },
   { h: "9. Your data", t: "We store your name, email, phone number, game activity and coin balance to run the service, prevent abuse and measure app usage. We do not sell your personal data. You can delete your account and data anytime from Profile." },

@@ -39,6 +39,7 @@ export default function AuthScreen({ onLoggedIn }) {
     setBusy(true);
     try {
       await signUp({ email: fEmail.trim().toLowerCase(), password: fPass, name: fName.trim(), phone: fPhone.trim() });
+      notify('Welcome to MCP Fantasy! Check the Coins tab for your welcome bonus.');
       onLoggedIn();
     } catch (e) {
       notify(e.message);

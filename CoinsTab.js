@@ -1,3 +1,4 @@
+// MCP v3 - free-to-play version
 import React, { useState, useEffect, useCallback } from 'react';
 import { Text, View, ScrollView } from 'react-native';
 import { styles } from './styles';
@@ -9,9 +10,9 @@ import RedeemModal from './RedeemModal';
 import { fmtNum } from './constants';
 
 const statusColor = (s) => (s === 'fulfilled' ? '#1b5e20' : s === 'rejected' ? '#b71c1c' : '#8d6e00');
-const kindText = { prize: 'Contest prize', ad_bonus: 'Ad bonus', redeem: 'Reward request', redeem_refund: 'Refund', admin_adjust: 'Adjustment' };
+const kindText = { prize: 'Contest prize', ad_bonus: 'Ad bonus', welcome: 'Welcome bonus', expire: 'Expired', redeem: 'Reward request', redeem_refund: 'Refund', admin_adjust: 'Adjustment' };
 
-export default function CoinsTab({ coins, rewards, onChanged }) {
+export default function CoinsTab({ coins, rewards, settings, onChanged }) {
   const [bonus, setBonus] = useState(null);
   const [busy, setBusy] = useState(false);
   const [reds, setReds] = useState([]);
@@ -46,6 +47,13 @@ export default function CoinsTab({ coins, rewards, onChanged }) {
     setBusy(false);
   };
 
+  const st = settings || {};
+  const expDays = Number(st.coin_expiry_days || 90);
+  const rules =
+    (expDays > 0 ? '• Coins expire ' + expDays + ' days after you earn them, so use them in time.' : '• Your coins do not expire.') +
+    '\n• To redeem: your account must be ' + (st.redeem_min_account_days || 7) + '+ days old and you must have joined ' + (st.redeem_min_entries || 3) + '+ contests.' +
+    '\n• Limit: ' + (st.redeem_monthly_limit || 1) + ' reward per month.';
+
   return (
     <ScrollView style={styles.listSection} keyboardShouldPersistTaps="handled">
       <View style={{ backgroundColor: '#2a2208', borderRadius: 12, padding: 16, borderWidth: 1, borderColor: C.gold, marginBottom: 12 }}>
@@ -63,6 +71,9 @@ export default function CoinsTab({ coins, rewards, onChanged }) {
       </View>
 
       <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 15, marginBottom: 8 }}>🎟️ Rewards</Text>
+      <View style={{ backgroundColor: '#161616', borderRadius: 8, padding: 10, marginBottom: 10 }}>
+        <Text style={{ color: C.sub, fontSize: 11, lineHeight: 17 }}>{rules}</Text>
+      </View>
       {(rewards || []).map((r) => {
         const pct = Math.min(100, Math.floor((Number(coins) / Number(r.coins_cost)) * 100));
         const can = Number(coins) >= Number(r.coins_cost);

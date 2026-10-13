@@ -1,3 +1,4 @@
+// MCP v3 - free-to-play version
 import React, { useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import { Chips } from './ui';
@@ -5,6 +6,8 @@ import AdminMovies from './AdminMovies';
 import AdminResults from './AdminResults';
 import AdminRequests from './AdminRequests';
 import AdminSponsors from './AdminSponsors';
+import AdminEarnings from './AdminEarnings';
+import AdminSettings from './AdminSettings';
 import { AdminOverview, AdminUsers, AdminNotify } from './AdminMisc';
 
 export default function Admin({ movies, onChanged }) {
@@ -17,9 +20,11 @@ export default function Admin({ movies, onChanged }) {
           { key: 'movies', label: '🎬 Movies' },
           { key: 'results', label: '🏆 Results' },
           { key: 'requests', label: '🎟️ Requests' },
+          { key: 'earnings', label: '💰 Earnings' },
           { key: 'users', label: '👥 Users' },
           { key: 'sponsors', label: '💼 Sponsors' },
           { key: 'notify', label: '📢 Notify' },
+          { key: 'settings', label: '⚙️ Settings' },
         ]}
         value={sec}
         onChange={setSec}
@@ -31,6 +36,8 @@ export default function Admin({ movies, onChanged }) {
       {sec === 'users' ? <AdminUsers onChanged={onChanged} /> : null}
       {sec === 'sponsors' ? <AdminSponsors /> : null}
       {sec === 'notify' ? <AdminNotify /> : null}
+      {sec === 'earnings' ? <AdminEarnings /> : null}
+      {sec === 'settings' ? <AdminSettings /> : null}
       <View style={{ height: 40 }} />
     </ScrollView>
   );

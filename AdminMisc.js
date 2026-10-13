@@ -1,3 +1,4 @@
+// MCP v3 - free-to-play version
 import React, { useState, useEffect } from 'react';
 import { View, Text } from 'react-native';
 import { C, notify, confirmBox, Btn, Field, dateText } from './ui';
@@ -49,6 +50,8 @@ export function AdminOverview() {
         <Text style={{ color: '#ddd', fontSize: 13 }}>{'In circulation: ' + n('coins_in_circulation')}</Text>
         <Text style={{ color: '#ddd', fontSize: 13 }}>{'Paid as contest prizes: ' + n('coins_paid_prizes')}</Text>
         <Text style={{ color: '#ddd', fontSize: 13 }}>{'Paid as ad bonus: ' + n('coins_paid_ads')}</Text>
+        <Text style={{ color: '#ddd', fontSize: 13 }}>{'Given as welcome bonus: ' + n('coins_paid_welcome')}</Text>
+        <Text style={{ color: '#ddd', fontSize: 13 }}>{'Expired so far: ' + n('coins_expired')}</Text>
         <Text style={{ color: C.gold, fontSize: 13, marginTop: 4 }}>{'Pending ticket requests: ' + n('pending_redemptions')}</Text>
       </View>
       <Btn title="🔄 Refresh" color="#333" onPress={load} />

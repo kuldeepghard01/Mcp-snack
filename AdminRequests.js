@@ -1,3 +1,4 @@
+// MCP v3 - free-to-play version
 import React, { useState, useEffect } from 'react';
 import { View, Text } from 'react-native';
 import { C, notify, confirmBox, Btn, Field, Chips, dateText } from './ui';
@@ -9,6 +10,7 @@ export default function AdminRequests({ onChanged }) {
   const [status, setStatus] = useState('pending');
   const [list, setList] = useState([]);
   const [notes, setNotes] = useState({});
+  const [costs, setCosts] = useState({});
   const [busy, setBusy] = useState(false);
 
   const load = async () => {
@@ -17,11 +19,16 @@ export default function AdminRequests({ onChanged }) {
   useEffect(() => { load(); }, [status]);
 
   const decide = async (r, fulfill) => {
+    let cost = null;
+    if (fulfill && costs[r.id]) {
+      cost = parseFloat(costs[r.id]);
+      if (isNaN(cost) || cost < 0) { notify('Enter the ticket cost as a number, or leave it empty.'); return; }
+    }
     const ok = await confirmBox(fulfill ? 'Mark as fulfilled? The user will see your message.' : 'Reject this request and return the coins?');
     if (!ok) return;
     setBusy(true);
     try {
-      await rpc('mcp_admin_decide_redemption', { p_id: r.id, p_fulfill: fulfill, p_note: notes[r.id] || null });
+      await rpc('mcp_admin_decide_redemption', { p_id: r.id, p_fulfill: fulfill, p_note: notes[r.id] || null, p_cost: cost });
       await load();
       onChanged();
     } catch (e) {
@@ -50,6 +57,7 @@ export default function AdminRequests({ onChanged }) {
           {status === 'pending' ? (
             <View style={{ marginTop: 8 }}>
               <Field label="Message to user (ticket code, booking link or reason)" value={notes[r.id] || ''} onChangeText={(v) => setNotes({ ...notes, [r.id]: v })} multiline autoCapitalize="sentences" maxLength={300} />
+              <Field label="Ticket cost you paid (optional, used in Earnings)" value={costs[r.id] || ''} onChangeText={(v) => setCosts({ ...costs, [r.id]: v })} keyboardType="decimal-pad" maxLength={9} />
               <View style={{ flexDirection: 'row' }}>
                 <Btn title="✅ Fulfilled" small color="#1b5e20" onPress={() => decide(r, true)} disabled={busy} style={{ marginRight: 8 }} />
                 <Btn title="❌ Reject" small color="#b71c1c" onPress={() => decide(r, false)} disabled={busy} />

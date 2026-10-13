@@ -1,3 +1,4 @@
+// MCP v3 - free-to-play version
 import React, { useEffect, useRef } from 'react';
 import { Text, View, FlatList, Image, TouchableOpacity, Linking } from 'react-native';
 import { styles } from './styles';
@@ -29,7 +30,7 @@ function SponsorCard({ sponsor }) {
   );
 }
 
-export default function MoviesTab({ movies, counts, sponsors, category, onCategory, refreshing, onRefresh, onOpen, onTrailer }) {
+export default function MoviesTab({ movies, counts, joined, sponsors, category, onCategory, refreshing, onRefresh, onOpen, onTrailer }) {
   const filtered = category === 'ALL' ? movies : movies.filter((m) => (m.category || '').toLowerCase() === category.toLowerCase());
   const items = [];
   filtered.forEach((m, i) => {
@@ -95,7 +96,7 @@ export default function MoviesTab({ movies, counts, sponsors, category, onCatego
                   {locked ? (
                     <View style={styles.closedBtn}><Text style={{ color: C.sub, fontSize: 11, fontWeight: 'bold' }}>View ➔</Text></View>
                   ) : (
-                    <View style={styles.predictBtn}><Text style={styles.predictBtnText}>Join free ➔</Text></View>
+                    <View style={styles.predictBtn}><Text style={styles.predictBtnText}>{joined && joined[m.id] ? '✅ Joined - Edit ➔' : 'Join free ➔'}</Text></View>
                   )}
                 </View>
               </View>

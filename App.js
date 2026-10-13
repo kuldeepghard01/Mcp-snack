@@ -18,7 +18,7 @@ import { NotificationsModal, TermsModal } from './Modals';
 import { C, notify, confirmBox, Btn } from './ui';
 import { loadSession, hasSession, getUserId, signOut, select, rpc } from './api';
 import { initAds } from './ads';
-import { fmtNum } from './constants';
+import { fmtNum, isLocked } from './constants';
 
 const SEEN_KEY = '@mcp_seen_notif_v3';
 
@@ -34,6 +34,7 @@ export default function App() {
   const [tiers, setTiers] = useState([]);
   const [rewards, setRewards] = useState([]);
   const [sponsors, setSponsors] = useState([]);
+  const [settings, setSettings] = useState({});
   const [seenId, setSeenId] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
   const [tab, setTab] = useState('contests');
@@ -58,6 +59,7 @@ export default function App() {
         select('mcp_prize_tiers', 'select=*&order=from_rank.asc'),
         select('mcp_rewards', 'active=eq.true&select=*&order=sort.asc'),
         select('mcp_sponsors', 'active=eq.true&select=*&order=created_at.desc'),
+        select('mcp_settings', 'select=*'),
       ]);
       if (r[0] && r[0][0]) setProfile(r[0][0]);
       setMovies(r[1] || []);
@@ -69,6 +71,9 @@ export default function App() {
       setTiers(r[5] || []);
       setRewards(r[6] || []);
       setSponsors(r[7] || []);
+      const sm = {};
+      (r[8] || []).forEach((x) => { sm[x.key] = x.value; });
+      setSettings(sm);
     } catch (e) {
       if (!hasSession()) {
         setLoggedIn(false);
@@ -161,6 +166,8 @@ export default function App() {
   const trailerMovie = find(trailerId);
   const unseen = notifs.length > 0 && notifs[0].id > seenId;
   const isAdmin = !!(profile && profile.is_admin);
+  const joinedMap = {};
+  entries.forEach((e) => { joinedMap[e.movie_id] = true; });
 
   if (!splashDone) return <Splash onFinish={() => setSplashDone(true)} />;
   if (booting) return <View style={{ flex: 1, backgroundColor: '#000' }} />;
@@ -221,12 +228,19 @@ export default function App() {
         <MoviesTab
           movies={movies}
           counts={counts}
+          joined={joinedMap}
           sponsors={sponsors}
           category={category}
           onCategory={setCategory}
           refreshing={refreshing}
           onRefresh={onRefresh}
-          onOpen={(m) => setScreen({ id: m.id, tab: 'prizes' })}
+          onOpen={(m) => {
+            if (isLocked(m)) setScreen({ id: m.id, tab: m.settled_at ? 'leaderboard' : 'prizes' });
+            else {
+              const en = entries.find((e) => e.movie_id === m.id);
+              setJoin({ id: m.id, entryId: en ? en.id : null });
+            }
+          }}
           onTrailer={(m) => setTrailerId(m.id)}
         />
       ) : null}
@@ -236,11 +250,11 @@ export default function App() {
           movies={movies}
           refreshing={refreshing}
           onRefresh={onRefresh}
-          onOpen={(m) => setScreen({ id: m.id, tab: 'leaderboard' })}
+          onOpen={(m) => setScreen({ id: m.id, tab: m.settled_at ? 'leaderboard' : 'prizes' })}
           onEdit={(m, en) => setJoin({ id: m.id, entryId: en.id })}
         />
       ) : null}
-      {tab === 'coins' ? <CoinsTab coins={profile ? Number(profile.coins) : 0} rewards={rewards} onChanged={() => loadAll(true)} /> : null}
+      {tab === 'coins' ? <CoinsTab coins={profile ? Number(profile.coins) : 0} rewards={rewards} settings={settings} onChanged={() => loadAll(true)} /> : null}
       {tab === 'profile' ? <ProfileTab profile={profile} onTerms={() => setTermsOpen(true)} onLogout={doLogout} onDelete={doDelete} /> : null}
       {tab === 'admin' && isAdmin ? <Admin movies={movies} onChanged={() => loadAll(true)} /> : null}
 
@@ -259,6 +273,8 @@ export default function App() {
         visible={!!joinMovie}
         movie={joinMovie}
         entry={joinEntry}
+        topPrize={tiers.length > 0 ? tiers[0].coins : 0}
+        onTrailer={(m) => setTrailerId(m.id)}
         onClose={() => setJoin(null)}
         onDone={() => { setJoin(null); loadAll(true); }}
       />
