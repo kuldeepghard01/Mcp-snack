@@ -1,3 +1,4 @@
+// MCP v3 - free-to-play version
 import React from 'react';
 import { Text, View, FlatList } from 'react-native';
 import { styles } from './styles';
@@ -19,9 +20,11 @@ export default function MyContestsTab({ entries, movies, refreshing, onRefresh, 
           if (!mv) return null;
           const locked = isLocked(mv);
           const settled = !!mv.settled_at;
+          const same = entries.filter((e) => e.movie_id === item.movie_id).slice().sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+          const entryNo = same.findIndex((e) => e.id === item.id) + 1;
           return (
             <View style={[styles.card, { padding: 12 }]}>
-              <Text style={{ color: '#fff', fontSize: 15, fontWeight: 'bold' }}>{'🎬 ' + mv.title}</Text>
+              <Text style={{ color: '#fff', fontSize: 15, fontWeight: 'bold' }}>{'🎬 ' + mv.title + (same.length > 1 ? '  (Entry ' + entryNo + ')' : '')}</Text>
               <Text style={{ color: '#ddd', fontSize: 13, marginTop: 4 }}>{'My prediction: ' + fmtCr(item.prediction)}</Text>
               <Text style={{ color: settled ? C.gold : C.sub, fontSize: 12, marginTop: 4 }}>
                 {settled

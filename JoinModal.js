@@ -9,7 +9,7 @@ import { fmtCr, fmtNum, toCr, timeLeft, lockText, MAX_COLLECTION_CR } from './co
 const PLACEHOLDER = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=500';
 
 // Full screen "predict" page: collection prediction + movie Yes/No questions + Join with Ad.
-export default function JoinModal({ visible, movie, entry, topPrize, onClose, onDone, onTrailer }) {
+export default function JoinModal({ visible, movie, entry, topPrize, used = 0, max = 4, onClose, onDone, onTrailer }) {
   const [val, setVal] = useState('');
   const [unit, setUnit] = useState('cr');
   const [ans, setAns] = useState([]);
@@ -98,6 +98,7 @@ export default function JoinModal({ visible, movie, entry, topPrize, onClose, on
           </View>
           <Text style={{ color: '#888', fontSize: 11, marginTop: 8 }}>{movie.category + '  |  Release: ' + movie.release_date}</Text>
           <Text style={{ color: '#888', fontSize: 11 }}>{'Entries close: ' + lockText(movie)}</Text>
+          <Text style={{ color: '#aaa', fontSize: 11, marginTop: 2 }}>{isEdit ? 'Editing your entry' : 'Entry ' + (used + 1) + ' of ' + max}</Text>
           {topPrize ? <Text style={{ color: C.gold, fontSize: 12, fontWeight: 'bold', marginTop: 6 }}>{'🏆 Win up to 🪙 ' + fmtNum(topPrize) + ' coins'}</Text> : null}
 
           <Text style={{ color: '#fff', fontSize: 14, fontWeight: 'bold', marginTop: 18, marginBottom: 6 }}>About the movie</Text>
@@ -113,14 +114,11 @@ export default function JoinModal({ visible, movie, entry, topPrize, onClose, on
           <Chips options={[{ key: 'cr', label: 'Crore' }, { key: 'lakh', label: 'Lakh' }]} value={unit} onChange={setUnit} />
           <Field value={val} onChangeText={setVal} keyboardType="decimal-pad" placeholder={unit === 'cr' ? 'e.g. 85.68' : 'e.g. 50'} maxLength={10} />
           {!isNaN(cr) && cr > 0 ? <Text style={{ color: C.gold, fontSize: 12 }}>{'Your prediction: ' + fmtCr(cr)}</Text> : null}
+          <Btn title={busy ? 'Please wait...' : (isEdit ? 'Save changes' : 'Join with Ad  ▶')} onPress={submit} disabled={busy} color={C.red} style={{ borderRadius: 24, paddingVertical: 14, marginTop: 18 }} />
           <Text style={{ color: '#777', fontSize: 10, marginTop: 12 }}>
             Free to play. You can change your entry until entries close. Prizes and the leaderboard are in My Contests.
           </Text>
         </ScrollView>
-
-        <View style={{ padding: 14, backgroundColor: C.bg, borderTopWidth: 1, borderTopColor: '#222' }}>
-          <Btn title={busy ? 'Please wait...' : (isEdit ? 'Save changes' : 'Join with Ad  ▶')} onPress={submit} disabled={busy} color={C.red} style={{ borderRadius: 24, paddingVertical: 14 }} />
-        </View>
       </View>
     </Modal>
   );

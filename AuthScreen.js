@@ -15,6 +15,7 @@ export default function AuthScreen({ onLoggedIn }) {
   const [fEmail, setFEmail] = useState('');
   const [fPhone, setFPhone] = useState('');
   const [fPass, setFPass] = useState('');
+  const [fRef, setFRef] = useState('');
   const [agree, setAgree] = useState(false);
   const [busy, setBusy] = useState(false);
 
@@ -38,7 +39,7 @@ export default function AuthScreen({ onLoggedIn }) {
     if (!agree) { notify('Please confirm you are 18+ and accept the Terms.'); return; }
     setBusy(true);
     try {
-      await signUp({ email: fEmail.trim().toLowerCase(), password: fPass, name: fName.trim(), phone: fPhone.trim() });
+      await signUp({ email: fEmail.trim().toLowerCase(), password: fPass, name: fName.trim(), phone: fPhone.trim(), referral: fRef.trim() });
       notify('Welcome to MCP Fantasy! Check the Coins tab for your welcome bonus.');
       onLoggedIn();
     } catch (e) {
@@ -74,6 +75,7 @@ export default function AuthScreen({ onLoggedIn }) {
           {mode === 'register' ? <Field label="Name" value={fName} onChangeText={setFName} autoCapitalize="words" maxLength={30} /> : null}
           <Field label="Email" value={fEmail} onChangeText={setFEmail} keyboardType="email-address" />
           {mode === 'register' ? <Field label="Phone (with country code, digits only)" value={fPhone} onChangeText={setFPhone} keyboardType="phone-pad" maxLength={15} /> : null}
+          {mode === 'register' ? <Field label="Referral code (optional)" value={fRef} onChangeText={(v) => setFRef(v.toUpperCase())} autoCapitalize="characters" maxLength={12} /> : null}
           <Field label="Password (at least 8 characters)" value={fPass} onChangeText={setFPass} secure />
           {mode === 'register' ? (
             <View style={{ marginBottom: 12 }}>

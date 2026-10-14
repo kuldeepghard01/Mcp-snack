@@ -160,14 +160,15 @@ export default function App() {
 
   const find = (id) => (id ? movies.find((m) => m.id === id) || null : null);
   const screenMovie = screen ? find(screen.id) : null;
-  const screenEntry = screenMovie ? entries.find((e) => e.movie_id === screenMovie.id) || null : null;
+  const screenEntries = screenMovie ? entries.filter((e) => e.movie_id === screenMovie.id) : [];
   const joinMovie = join ? find(join.id) : null;
   const joinEntry = join && join.entryId ? entries.find((e) => e.id === join.entryId) || null : null;
   const trailerMovie = find(trailerId);
   const unseen = notifs.length > 0 && notifs[0].id > seenId;
   const isAdmin = !!(profile && profile.is_admin);
   const joinedMap = {};
-  entries.forEach((e) => { joinedMap[e.movie_id] = true; });
+  entries.forEach((e) => { joinedMap[e.movie_id] = (joinedMap[e.movie_id] || 0) + 1; });
+  const maxEntries = Number(settings.max_entries_per_movie || 4);
 
   if (!splashDone) return <Splash onFinish={() => setSplashDone(true)} />;
   if (booting) return <View style={{ flex: 1, backgroundColor: '#000' }} />;
@@ -229,6 +230,7 @@ export default function App() {
           movies={movies}
           counts={counts}
           joined={joinedMap}
+          maxEntries={maxEntries}
           sponsors={sponsors}
           category={category}
           onCategory={setCategory}
@@ -236,9 +238,11 @@ export default function App() {
           onRefresh={onRefresh}
           onOpen={(m) => {
             if (isLocked(m)) setScreen({ id: m.id, tab: m.settled_at ? 'leaderboard' : 'prizes' });
-            else {
-              const en = entries.find((e) => e.movie_id === m.id);
-              setJoin({ id: m.id, entryId: en ? en.id : null });
+            else if ((joinedMap[m.id] || 0) >= maxEntries) {
+              notify('You have used all ' + maxEntries + ' entries for this movie. You can edit them or see the leaderboard in My Contests.');
+              setTab('my');
+            } else {
+              setJoin({ id: m.id, entryId: null });
             }
           }}
           onTrailer={(m) => setTrailerId(m.id)}
@@ -255,13 +259,14 @@ export default function App() {
         />
       ) : null}
       {tab === 'coins' ? <CoinsTab coins={profile ? Number(profile.coins) : 0} rewards={rewards} settings={settings} onChanged={() => loadAll(true)} /> : null}
-      {tab === 'profile' ? <ProfileTab profile={profile} onTerms={() => setTermsOpen(true)} onLogout={doLogout} onDelete={doDelete} /> : null}
+      {tab === 'profile' ? <ProfileTab profile={profile} settings={settings} onTerms={() => setTermsOpen(true)} onLogout={doLogout} onDelete={doDelete} /> : null}
       {tab === 'admin' && isAdmin ? <Admin movies={movies} onChanged={() => loadAll(true)} /> : null}
 
       <MovieScreen
         visible={!!screenMovie}
         movie={screenMovie}
-        entry={screenEntry}
+        entries={screenEntries}
+        maxEntries={maxEntries}
         tiers={tiers}
         count={screenMovie ? counts[screenMovie.id] || 0 : 0}
         initialTab={screen ? screen.tab : 'prizes'}
@@ -273,6 +278,8 @@ export default function App() {
         visible={!!joinMovie}
         movie={joinMovie}
         entry={joinEntry}
+        used={joinMovie ? joinedMap[joinMovie.id] || 0 : 0}
+        max={maxEntries}
         topPrize={tiers.length > 0 ? tiers[0].coins : 0}
         onTrailer={(m) => setTrailerId(m.id)}
         onClose={() => setJoin(null)}

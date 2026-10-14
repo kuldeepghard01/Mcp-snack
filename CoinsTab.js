@@ -51,7 +51,7 @@ export default function CoinsTab({ coins, rewards, settings, onChanged }) {
   const expDays = Number(st.coin_expiry_days || 90);
   const rules =
     (expDays > 0 ? '• Coins expire ' + expDays + ' days after you earn them, so use them in time.' : '• Your coins do not expire.') +
-    '\n• To redeem: your account must be ' + (st.redeem_min_account_days || 7) + '+ days old and you must have joined ' + (st.redeem_min_entries || 3) + '+ contests.' +
+    '\n• To redeem: your account must be ' + (st.redeem_min_account_days || 7) + '+ days old and you must have joined ' + (st.redeem_min_entries || 3) + '+ different movies.' +
     '\n• Limit: ' + (st.redeem_monthly_limit || 1) + ' reward per month.';
 
   return (

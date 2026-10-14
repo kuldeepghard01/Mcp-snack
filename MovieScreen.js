@@ -10,7 +10,7 @@ const PLACEHOLDER = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3b
 
 const rankLabel = (t) => (t.from_rank === t.to_rank ? '#' + t.from_rank : '#' + t.from_rank + ' - #' + t.to_rank);
 
-export default function MovieScreen({ visible, movie, entry, tiers, count, initialTab, onClose, onJoin, onTrailer }) {
+export default function MovieScreen({ visible, movie, entries, maxEntries, tiers, count, initialTab, onClose, onJoin, onTrailer }) {
   const [tab, setTab] = useState('prizes');
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -35,7 +35,8 @@ export default function MovieScreen({ visible, movie, entry, tiers, count, initi
   const locked = isLocked(movie);
   const settled = !!movie.settled_at;
   const qs = movie.about_questions || [];
-  const mine = entry;
+  const mine = entries || [];
+  const maxE = maxEntries || 4;
 
   const tabBtn = (key, label) => (
     <TouchableOpacity onPress={() => setTab(key)} style={{ marginRight: 24, paddingBottom: 8, borderBottomWidth: 3, borderBottomColor: tab === key ? C.red : 'transparent' }}>
@@ -117,19 +118,20 @@ export default function MovieScreen({ visible, movie, entry, tiers, count, initi
                   ))}
                 </View>
               ) : null}
-              {mine ? (
-                <View style={{ backgroundColor: '#1a2a3a', padding: 12, borderRadius: 10, marginBottom: 12, borderWidth: 1, borderColor: C.blue }}>
-                  <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 13 }}>{'Your entry: ' + fmtCr(mine.prediction)}</Text>
+              {mine.map((en, k) => (
+                <View key={en.id} style={{ backgroundColor: '#1a2a3a', padding: 12, borderRadius: 10, marginBottom: 12, borderWidth: 1, borderColor: C.blue }}>
+                  <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 13 }}>{'Your entry ' + (k + 1) + ': ' + fmtCr(en.prediction)}</Text>
                   <Text style={{ color: '#ccc', fontSize: 11, marginTop: 3 }}>
-                    {(mine.answers || []).map((a, i) => (qs[i] || 'Q' + (i + 1)) + ': ' + (a ? 'Yes' : 'No')).join('  |  ')}
+                    {(en.answers || []).map((a, i) => (qs[i] || 'Q' + (i + 1)) + ': ' + (a ? 'Yes' : 'No')).join('  |  ')}
                   </Text>
-                  {mine.final_rank ? (
+                  {en.final_rank ? (
                     <Text style={{ color: C.gold, fontSize: 12, marginTop: 6, fontWeight: 'bold' }}>
-                      {'Rank #' + mine.final_rank + '  |  Score ' + mine.score + '  |  Won 🪙 ' + fmtNum(mine.prize)}
+                      {'Rank #' + en.final_rank + '  |  Score ' + en.score + '  |  Won 🪙 ' + fmtNum(en.prize)}
                     </Text>
                   ) : null}
+                  {!locked ? <Btn title="✏️ Edit" small color="#333" onPress={() => onJoin(movie, en)} style={{ marginTop: 8, alignSelf: 'flex-start' }} /> : null}
                 </View>
-              ) : null}
+              ))}
               {!locked ? (
                 <Text style={{ color: C.sub, fontSize: 11, marginBottom: 10 }}>Predictions of other players stay hidden until entries close.</Text>
               ) : null}
@@ -145,7 +147,7 @@ export default function MovieScreen({ visible, movie, entry, tiers, count, initi
               {rows.map((r, i) => (
                 <View key={i} style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: r.is_me ? '#1a2a3a' : '#1c1a1a', padding: 12, borderRadius: 10, marginBottom: 6, borderWidth: 1, borderColor: r.is_me ? C.blue : 'transparent' }}>
                   <Text style={{ color: C.gold, fontWeight: 'bold', width: 44 }}>{settled ? '#' + r.pos : '•'}</Text>
-                  <Text numberOfLines={1} style={{ color: '#fff', flex: 1, fontSize: 13 }}>{r.player + (r.is_me ? ' (You)' : '')}</Text>
+                  <Text numberOfLines={1} style={{ color: '#fff', flex: 1, fontSize: 13 }}>{r.player + (r.entry_no > 1 ? ' (' + r.entry_no + ')' : '') + (r.is_me ? ' (You)' : '')}</Text>
                   {settled ? (
                     <View style={{ alignItems: 'flex-end' }}>
                       <Text style={{ color: '#fff', fontSize: 12 }}>{r.score}</Text>
@@ -163,10 +165,10 @@ export default function MovieScreen({ visible, movie, entry, tiers, count, initi
         <View style={{ padding: 14, backgroundColor: C.bg, borderTopWidth: 1, borderTopColor: '#222' }}>
           {locked ? (
             <Btn title={settled ? 'Contest finished' : 'Entries closed'} disabled onPress={() => {}} />
-          ) : mine ? (
-            <Btn title="Edit my entry" color="#2a2a2a" onPress={() => onJoin(movie, mine)} />
+          ) : mine.length >= maxE ? (
+            <Btn title={'All ' + maxE + ' entries used'} disabled onPress={() => {}} />
           ) : (
-            <Btn title="Join free with Ad  ▶" color={C.red} onPress={() => onJoin(movie, null)} style={{ borderRadius: 24, paddingVertical: 14 }} />
+            <Btn title={mine.length > 0 ? 'Add another entry with Ad  ▶' : 'Join free with Ad  ▶'} color={C.red} onPress={() => onJoin(movie, null)} style={{ borderRadius: 24, paddingVertical: 14 }} />
           )}
         </View>
       </View>

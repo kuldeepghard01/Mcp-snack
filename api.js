@@ -1,3 +1,4 @@
+// MCP v3 - free-to-play version
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SUPABASE_URL, SUPABASE_KEY } from './constants';
 
@@ -66,8 +67,8 @@ const authCall = async (path, body) => {
   return j;
 };
 
-export const signUp = async ({ email, password, name, phone }) => {
-  const j = await authCall('signup', { email, password, data: { name, phone, terms: 'true' } });
+export const signUp = async ({ email, password, name, phone, referral }) => {
+  const j = await authCall('signup', { email, password, data: { name, phone, terms: 'true', referral: referral || '' } });
   if (!j.access_token) {
     throw new Error('Account created. Please confirm your email using the link we sent, then log in.');
   }
